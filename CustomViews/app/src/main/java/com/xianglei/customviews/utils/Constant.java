@@ -1,0 +1,17 @@
+package com.xianglei.customviews.utils;
+
+import android.graphics.Color;
+
+/**
+ * 提供各种常量
+ * Created by Administrator on 2017/8/6.
+ */
+
+public class Constant {
+
+    public static final String[] HISTOGRAM_NAMES = {"Froyo", "GB", "ICS", "JB", "KitKat", "L", "M"};
+    public static final int[] HISTOGRAM_COLORS = {Color.GREEN, Color.GREEN, Color.GREEN,
+            Color.GREEN, Color.GREEN, Color.GREEN, Color.GREEN};
+    public static final int[] HISTOGRAM_VALUES = {1 ,10, 10, 100, 200, 230, 80};
+
+}
