@@ -6,4 +6,5 @@
 
     <color name="black">#000000</color>
     <color name="gray">#aeabab</color>
+    <color name="deep_gray">#434141</color>
 </resources>
