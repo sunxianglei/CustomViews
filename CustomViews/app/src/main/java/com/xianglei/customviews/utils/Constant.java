@@ -9,9 +9,9 @@ import android.graphics.Color;
 
 public class Constant {
 
-    public static final String[] HISTOGRAM_NAMES = {"Froyo", "GB", "ICS", "JB", "KitKat", "L", "M"};
-    public static final int[] HISTOGRAM_COLORS = {Color.GREEN, Color.GREEN, Color.GREEN,
-            Color.GREEN, Color.GREEN, Color.GREEN, Color.GREEN};
+    public static final String[] HISTOGRAM_NAMES = {"Froyo", "GB", "ICS", "JB", "KitKatKitKat", "L", "M"};
+    public static final int[] HISTOGRAM_COLORS = {Color.GREEN, Color.RED, Color.BLUE,
+            Color.GREEN, Color.GREEN, Color.BLACK, Color.RED};
     public static final int[] HISTOGRAM_VALUES = {1 ,10, 10, 100, 200, 230, 80};
 
     public static final String[] PIE_NAMES = {"Lollopop", "KitKat", "Jelly Bean", "Ice Cream SandWich", "GingerBread",

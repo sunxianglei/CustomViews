@@ -74,7 +74,8 @@ public class PieChart extends View{
     private void countData(int width, int height){
         mRadius = Math.min(width, height) / 3;
         mTextLineLength = mRadius / 2;
-        int total = 0, max = 0, index = 0;
+        float total = 0, max = 0;
+        int index = 0;
         for(int i=0;i<values.length;i++){
             total += values[i];
             if(values[i] > max) {
