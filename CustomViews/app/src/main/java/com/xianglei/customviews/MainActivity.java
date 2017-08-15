@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     {
         pageModels.add(new PageModel( R.string.histogram, R.layout.view_histogram));
         pageModels.add(new PageModel( R.string.pie_chart, R.layout.view_pie_chart));
+        pageModels.add(new PageModel( R.string.float_view, R.layout.view_float));
     }
 
 
