@@ -2,61 +2,50 @@ package com.xianglei.customviews.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
-
-import com.xianglei.customviews.utils.DisplayUtil;
 
 /**
  * 可悬浮拖拽按钮
+ * 该按钮支持在父控件内拖动，如需全屏拖动只需把父控件设成最大，当然无法拖到标题那边
  * Created by sheng on 2017/8/9.
  */
 
 public class FloatView extends ImageButton {
 
-    private int screenWidth;
-    private int screenHeight;
     private int lastX;
     private int lastY;
-    private int locationY;
     private boolean isDrag;
-    private boolean isFirst = true;
-
-    private Paint mPaint;
+    private int parentTop;
+    private int parentLeft;
+    private int parentBottom;
+    private int parentRight;
 
     public FloatView(Context context) {
         super(context);
-        init();
     }
 
     public FloatView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public FloatView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    private void init() {
-        mPaint = new Paint();
-        screenWidth = DisplayUtil.getMobileWidth(getContext());
-        screenHeight = DisplayUtil.getMobileHeight(getContext());
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-//        if (isFirst) {
-//            int[] location = new int[2];
-//            this.getLocationOnScreen(location);//获取在整个屏幕内的绝对坐标
-//            locationY = location[1];
-//            isFirst = false;
-//        }
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        parentTop = ((ViewGroup)this.getParent()).getTop();
+        parentLeft = ((ViewGroup)this.getParent()).getLeft();
+        parentBottom = ((ViewGroup)this.getParent()).getBottom();
+        parentRight = ((ViewGroup)this.getParent()).getRight();
+        Log.v("FloatView_sun", "parentTop = " + parentTop + "parentLeft = " + parentLeft +
+                "parentBottom = " + parentBottom + "parentRight = " + parentRight);
     }
 
     @Override
@@ -83,9 +72,9 @@ public class FloatView extends ImageButton {
                 }
                 float x = getX() + dx;
                 float y = getY() + dy;
-                //检测是否到达边缘 左上右下
-                x = x < 0 ? 0 : x > screenWidth - getWidth() ? screenWidth - getWidth() : x;
-                y = y < 0 ? 0 : y > screenHeight - getHeight() - locationY ? screenHeight - getHeight() - locationY : y;
+                //检测是否到达父控件边缘
+                x = x < parentLeft ? parentLeft : x > parentRight - getWidth() ? parentRight - getWidth() : x;
+                y = y < parentTop ? parentTop : y > parentBottom - getHeight() ? parentBottom - getHeight() : y;
                 setX(x);
                 setY(y);
                 lastX = rawX;
