@@ -12,7 +12,7 @@ import android.widget.ImageButton;
 /**
  * 可悬浮拖拽按钮
  * 该按钮支持在父控件内拖动，如需全屏拖动只需把父控件设成最大，当然无法拖到标题那边
- * Created by sheng on 2017/8/9.
+ * Created by sunxianglei on 2017/8/9.
  */
 
 public class FloatView extends ImageButton {

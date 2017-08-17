@@ -7,9 +7,17 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    
     <declare-styleable name="Histogram">
-
+        <attr name="histogram_textSize" format="dimension"></attr>
+        <attr name="histogram_textColor" format="color"></attr>
     </declare-styleable>
+
+    <!--<declare-styleable name="PieChart">-->
+        <!--<attr name="pie_textSize" format="dimension"></attr>-->
+        <!--<attr name="pie_textColor" format="color"></attr>-->
+        <!--<attr name="pie_lineScale" format="float"></attr>-->
+        <!--<attr name="pie_lineColor" format="color"></attr>-->
+    <!--</declare-styleable>-->
 
 </resources>

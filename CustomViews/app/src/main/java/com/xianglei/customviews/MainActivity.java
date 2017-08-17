@@ -1,13 +1,15 @@
 package com.xianglei.customviews;
 
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+
+import com.xianglei.customviews.fragment.HistogramFragment;
+import com.xianglei.customviews.fragment.PieChartFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,24 +20,19 @@ public class MainActivity extends AppCompatActivity {
     ViewPager pager;
     List<PageModel> pageModels = new ArrayList<>();
 
-    {
-        pageModels.add(new PageModel( R.string.histogram, R.layout.view_histogram));
-        pageModels.add(new PageModel( R.string.pie_chart, R.layout.view_pie_chart));
-        pageModels.add(new PageModel( R.string.float_view, R.layout.view_float));
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initPageModel();
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
 
             @Override
             public Fragment getItem(int position) {
                 PageModel pageModel = pageModels.get(position);
-                return PageFragment.newInstance(pageModel.practiceLayoutRes);
+                return pageModel.fragment;
             }
 
             @Override
@@ -53,15 +50,20 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(pager);
     }
 
+    private void initPageModel(){
+        pageModels.add(new PageModel( R.string.histogram, new HistogramFragment()));
+        pageModels.add(new PageModel( R.string.pie_chart, new PieChartFragment()));
+        pageModels.add(new PageModel( R.string.float_view, new HistogramFragment()));
+    }
+
     private class PageModel {
         @StringRes
         int titleRes;
-        @LayoutRes
-        int practiceLayoutRes;
+        Fragment fragment;
 
-        PageModel(@StringRes int titleRes, @LayoutRes int practiceLayoutRes) {
+        PageModel(@StringRes int titleRes, Fragment fragment) {
             this.titleRes = titleRes;
-            this.practiceLayoutRes = practiceLayoutRes;
+            this.fragment = fragment;
         }
     }
 }

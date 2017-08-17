@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 
 /**
  * dp,sp,px互转
- * Created by sxl on 2017/2/4.
+ * Created by sunxianglei on 2017/2/4.
  */
 
 public class DisplayUtil {
