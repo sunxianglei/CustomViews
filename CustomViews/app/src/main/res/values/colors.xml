@@ -7,5 +7,9 @@
     <color name="black">#000000</color>
     <color name="gray">#aeabab</color>
     <color name="deep_gray">#434141</color>
-    <color name="blue">#4294f2</color>
+    <color name="blue">#0a77f4</color>
+    <color name="red">#c91313</color>
+    <color name="white">#ffffff</color>
+    <color name="green">#206b05</color>
+    <color name="yellow">#ffd000</color>
 </resources>
