@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -26,19 +27,20 @@ public class Histogram extends View {
     private static final int SCALE_LENGHT = 3;                      // Y轴刻度长度
     private static final float RECT_WIDTH_SCALE = 0.8f;             // 矩形宽度占比
     private static final float RECT_BLANK_WIDTH_SCALE = 0.2f;       // 矩形之间距离占比
-    private static final float Y_HEIGHT_SCALE = 1.2f;               // Y轴高度相对最高矩形的倍数
+    private static final float Y_HEIGHT_RATIO = 1.2f;               // Y轴高度相对最高矩形的倍数
 
     private String[] names;
     private int[] colors;
     private int[] values;
-    private float lengthX;      //X轴的长度
-    private float lengthY;      //Y轴的长度
-    private float maxValue;     //对应Y轴最高点的值
     private AttrsModel attrsModel;
+    private CoordinateModel coordinateModel;
     private List<HistogramModel> histogramModelList;
+    private boolean isHideScale;//是否隐藏Y轴刻度
 
     private Context mContext;
-    private Paint mPaint;
+    private Paint mTextPaint;
+    private Paint mRectPaint;
+    private Paint mLinePaint;
 
     public Histogram(Context context) {
         super(context, null);
@@ -51,20 +53,27 @@ public class Histogram extends View {
     }
 
     private void init(AttributeSet attrs) {
+        mTextPaint = new Paint();
+        mRectPaint = new Paint();
+        mLinePaint = new Paint();
+        mTextPaint.setAntiAlias(true);
+        mRectPaint.setAntiAlias(true);
+        mRectPaint.setStyle(Paint.Style.FILL);
+        mLinePaint.setAntiAlias(true);
+
         this.names = Constant.HISTOGRAM_NAMES;
         this.colors = Constant.HISTOGRAM_COLORS;
         this.values = Constant.HISTOGRAM_VALUES;
 
         histogramModelList = new ArrayList<>();
+        coordinateModel = new CoordinateModel();
         attrsModel = new AttrsModel();
         TypedArray ta = mContext.obtainStyledAttributes(attrs, R.styleable.Histogram);
         attrsModel.textSize = ta.getDimension(R.styleable.Histogram_histogram_textSize, DisplayUtil.dip2px(mContext, HISTOGRAM_TEXTSIZE));
         attrsModel.textColor = ta.getColor(R.styleable.Histogram_histogram_textColor, Color.BLACK);
+        attrsModel.scaleTextSize = ta.getDimension(R.styleable.Histogram_histogram_scaleTextSize, DisplayUtil.dip2px(mContext, HISTOGRAM_TEXTSIZE));
+        attrsModel.scaleTextColor = ta.getColor(R.styleable.Histogram_histogram_scaleTextColor, Color.BLACK);
 
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setTextSize(attrsModel.textSize);
     }
 
     /**
@@ -80,23 +89,34 @@ public class Histogram extends View {
         if (values != null) this.values = values;
     }
 
+    public void hideScale(boolean isHideScale){
+        this.isHideScale = isHideScale;
+    }
+
     /**
-     * 计算各种数据，并存放到model中
+     * 清除数据
+     */
+    private void clearData(){
+        histogramModelList.clear();
+    }
+
+    /**
+     * 计算坐标、柱状图数据，并存放到model中
      */
     private void countData() {
         if ((names.length != values.length && values.length != colors.length) || (names.length == 0))
             return;
-        float valueWidth = RECT_WIDTH_SCALE * (lengthX * 1.0f / names.length); // 每个矩形的宽度
-        float valueBlankWidth = RECT_BLANK_WIDTH_SCALE * (lengthX * 1.0f / (names.length + 1)); // 每个矩形之间的距离
-        maxValue = 0;
+        float valueWidth = RECT_WIDTH_SCALE * (coordinateModel.lengthX * 1.0f / names.length); // 每个矩形的宽度
+        float valueBlankWidth = RECT_BLANK_WIDTH_SCALE * (coordinateModel.lengthX * 1.0f / (names.length + 1)); // 每个矩形之间的距离
+        float maxValue = 0;
         for (int i = 0; i < values.length; i++) {
             if (maxValue < values[i]) maxValue = values[i];
         }
-        maxValue = Y_HEIGHT_SCALE * maxValue; // Y轴的高度
+        coordinateModel.maxValue = Y_HEIGHT_RATIO * maxValue; // Y轴的最大值
         for (int i = 0; i < names.length; i++) {
             HistogramModel model = new HistogramModel();
             model.left = valueBlankWidth + i * (valueBlankWidth + valueWidth);
-            model.top = -lengthY * (values[i] / maxValue);
+            model.top = -coordinateModel.lengthY * (values[i] / coordinateModel.maxValue);
             model.right = model.left + valueWidth;
             model.bottom = 0;
             model.centerX = model.left + valueWidth / 2;
@@ -109,10 +129,11 @@ public class Histogram extends View {
 
     /**
      * 计算单位刻度
+     * 根据计算出的平均值拿出第一位数并乘以对应的以10为底的指数
      * @return
      */
     private int countUnitValue(){
-        int eachValue = (int) (maxValue/histogramModelList.size());
+        int eachValue = (int) (coordinateModel.maxValue/histogramModelList.size());
         StringBuffer str = new StringBuffer();
         while(eachValue != 0){
             int num = eachValue % 10;
@@ -132,10 +153,10 @@ public class Histogram extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        histogramModelList.clear();
+        clearData();
         drawCoordinate(canvas);
         countData();
-        drawScale(canvas);
+        if(!isHideScale) drawScale(canvas);
         drawHistogram(canvas);
     }
 
@@ -150,12 +171,12 @@ public class Histogram extends View {
         int top = getPaddingTop();
         int right = getPaddingRight();
         int bottom = getPaddingBottom();
-        lengthX = width - left - right;
-        lengthY = height - top - bottom;
-        float[] coordinate = {0, 0, lengthX, 0, 0, 0, 0, -lengthY};
+        coordinateModel.lengthX = width - left - right;
+        coordinateModel.lengthY = height - top - bottom;
+        float[] coordinate = {0, 0, coordinateModel.lengthX, 0, 0, 0, 0, -coordinateModel.lengthY};
         canvas.translate(left, height - bottom);
-        mPaint.setColor(Color.BLACK);
-        canvas.drawLines(coordinate, mPaint);
+        mLinePaint.setColor(Color.BLACK);
+        canvas.drawLines(coordinate, mLinePaint);
     }
 
     /**
@@ -167,13 +188,20 @@ public class Histogram extends View {
         if(size == 0)
             return;
         int unitValue = countUnitValue();
-        int length = (int)(maxValue / unitValue);
+        int length = (int)(coordinateModel.maxValue / unitValue);
         float scale = 0;
+        Rect mBounds = new Rect();
+        mLinePaint.setColor(Color.BLACK);
+        mTextPaint.setTextAlign(Paint.Align.RIGHT);
+        mTextPaint.setColor(attrsModel.scaleTextColor);
+        mTextPaint.setTextSize(attrsModel.scaleTextSize);
         for(int i=0;i < length;i++) {
-            scale += unitValue * 1.0f / maxValue * lengthY;
-            canvas.drawLine(0, -scale, DisplayUtil.dip2px(mContext, SCALE_LENGHT), -scale, mPaint);
-            mPaint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText(String.valueOf(unitValue * (i + 1)), -DisplayUtil.dip2px(mContext, SCALE_LENGHT), -scale + mPaint.getFontSpacing()/3, mPaint);
+            scale += unitValue * 1.0f / coordinateModel.maxValue * coordinateModel.lengthY;
+            canvas.drawLine(0, -scale, DisplayUtil.dip2px(mContext, SCALE_LENGHT), -scale, mLinePaint);
+            String value = String.valueOf(unitValue * (i + 1));
+            mTextPaint.getTextBounds(value, 0, value.length(), mBounds);
+            canvas.drawText(value, -DisplayUtil.dip2px(mContext, SCALE_LENGHT),
+                    -scale + mBounds.height()/2, mTextPaint);
         }
     }
 
@@ -182,15 +210,16 @@ public class Histogram extends View {
      * @param canvas
      */
     private void drawHistogram(Canvas canvas) {
-        mPaint.setTextAlign(Paint.Align.CENTER);
-        float fontSpacing = mPaint.getFontSpacing();
+        mTextPaint.setTextAlign(Paint.Align.CENTER);
+        mTextPaint.setColor(attrsModel.textColor);
+        mTextPaint.setTextSize(attrsModel.textSize);
+        float fontSpacing = mTextPaint.getFontSpacing();
         for (int i = 0; i < histogramModelList.size(); i++) {
             HistogramModel model = histogramModelList.get(i);
-            mPaint.setColor(attrsModel.textColor);
-            canvas.drawText(model.name, model.centerX, fontSpacing, mPaint);                       // 画名称
-            canvas.drawText(String.valueOf(model.value), model.centerX, model.top - 10, mPaint);   // 画值
-            mPaint.setColor(model.color);
-            canvas.drawRect(model.left, model.top, model.right, model.bottom, mPaint);              // 画矩形
+            canvas.drawText(model.name, model.centerX, fontSpacing, mTextPaint);                       // 画名称
+            canvas.drawText(String.valueOf(model.value), model.centerX, model.top - 10, mTextPaint);   // 画值
+            mRectPaint.setColor(model.color);
+            canvas.drawRect(model.left, model.top, model.right, model.bottom, mRectPaint);              // 画矩形
         }
     }
 
@@ -214,5 +243,16 @@ public class Histogram extends View {
     class AttrsModel {
         public float textSize;
         public int textColor;
+        public float scaleTextSize; //刻度值文字大小
+        public int scaleTextColor;  //刻度值文字颜色
+    }
+
+    /**
+     * 坐标数据模型
+     */
+    class CoordinateModel{
+        public float lengthX;      //X轴的长度
+        public float lengthY;      //Y轴的长度
+        public float maxValue;     //对应Y轴最高点的值
     }
 }
