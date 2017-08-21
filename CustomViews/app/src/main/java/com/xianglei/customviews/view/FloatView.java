@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 /**
  * 可悬浮拖拽按钮
  * 该按钮支持在父控件内拖动，如需全屏拖动只需把父控件设成最大，当然无法拖到标题那边
+ * 整屏拖动暂不支持，后续可能会修改
  * Created by sunxianglei on 2017/8/9.
  */
 
@@ -70,13 +71,13 @@ public class FloatView extends ImageButton {
                     isDrag = false;
                     break;
                 }
-                float x = getX() + dx;
-                float y = getY() + dy;
+                float x = ((ViewGroup)this.getParent()).getX() + dx;
+                float y = ((ViewGroup)this.getParent()).getY() + dy;
                 //检测是否到达父控件边缘
                 x = x < parentLeft ? parentLeft : x > parentRight - getWidth() ? parentRight - getWidth() : x;
                 y = y < parentTop ? parentTop : y > parentBottom - getHeight() ? parentBottom - getHeight() : y;
-                setX(x);
-                setY(y);
+                ((ViewGroup)this.getParent()).setX(x);
+                ((ViewGroup)this.getParent()).setY(y);
                 lastX = rawX;
                 lastY = rawY;
                 break;
