@@ -17,10 +17,13 @@ import com.xianglei.customviews.view.FloatView;
 
 public class FloatViewFragment extends Fragment{
 
+    private FloatView mFloatView;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_float, container, false);
+        mFloatView = (FloatView)view.findViewById(R.id.view_float);
+        mFloatView.setClickable(true);
         return view;
     }
 
