@@ -8,7 +8,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
+import com.nineoldandroids.animation.ValueAnimator;
 import com.xianglei.customviews.R;
 import com.xianglei.customviews.utils.Constant;
 import com.xianglei.customviews.utils.DisplayUtil;
@@ -36,6 +38,7 @@ public class Histogram extends View {
     private CoordinateModel coordinateModel;
     private List<HistogramModel> histogramModelList;
     private boolean isHideScale;//是否隐藏Y轴刻度
+    private boolean isHideValue;//是否隐藏矩形上方的值
 
     private Context mContext;
     private Paint mTextPaint;
@@ -65,13 +68,12 @@ public class Histogram extends View {
         this.colors = Constant.HISTOGRAM_COLORS;
         this.values = Constant.HISTOGRAM_VALUES;
 
-        histogramModelList = new ArrayList<>();
         coordinateModel = new CoordinateModel();
         attrsModel = new AttrsModel();
         TypedArray ta = mContext.obtainStyledAttributes(attrs, R.styleable.Histogram);
-        attrsModel.textSize = ta.getDimension(R.styleable.Histogram_histogram_textSize, DisplayUtil.dip2px(mContext, HISTOGRAM_TEXTSIZE));
+        attrsModel.textSize = ta.getDimension(R.styleable.Histogram_histogram_textSize, DisplayUtil.sp2px(mContext, HISTOGRAM_TEXTSIZE));
         attrsModel.textColor = ta.getColor(R.styleable.Histogram_histogram_textColor, Color.BLACK);
-        attrsModel.scaleTextSize = ta.getDimension(R.styleable.Histogram_histogram_scaleTextSize, DisplayUtil.dip2px(mContext, HISTOGRAM_TEXTSIZE));
+        attrsModel.scaleTextSize = ta.getDimension(R.styleable.Histogram_histogram_scaleTextSize, DisplayUtil.sp2px(mContext, HISTOGRAM_TEXTSIZE));
         attrsModel.scaleTextColor = ta.getColor(R.styleable.Histogram_histogram_scaleTextColor, Color.BLACK);
 
     }
@@ -89,8 +91,20 @@ public class Histogram extends View {
         if (values != null) this.values = values;
     }
 
+    /**
+     * 隐藏Y轴坐标的刻度
+     * @param isHideScale
+     */
     public void hideScale(boolean isHideScale){
         this.isHideScale = isHideScale;
+    }
+
+    /**
+     * 隐藏矩形上方的值
+     * @param isHideValue
+     */
+    public void hideValue(boolean isHideValue){
+        this.isHideValue = isHideValue;
     }
 
     /**
@@ -153,10 +167,15 @@ public class Histogram extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        clearData();
         drawCoordinate(canvas);
-        countData();
-        if(!isHideScale) drawScale(canvas);
+        if (histogramModelList == null) {
+            histogramModelList = new ArrayList<>();
+            countData();
+            startAnimation();
+        }
+        if (!isHideScale){
+            drawScale(canvas);
+        }
         drawHistogram(canvas);
     }
 
@@ -217,10 +236,40 @@ public class Histogram extends View {
         for (int i = 0; i < histogramModelList.size(); i++) {
             HistogramModel model = histogramModelList.get(i);
             canvas.drawText(model.name, model.centerX, fontSpacing, mTextPaint);                       // 画名称
-            canvas.drawText(String.valueOf(model.value), model.centerX, model.top - 10, mTextPaint);   // 画值
+            if (!isHideValue) {
+                canvas.drawText(String.valueOf(model.nowValue), model.centerX, model.nowHeight - 10, mTextPaint);   // 画值
+            }
             mRectPaint.setColor(model.color);
-            canvas.drawRect(model.left, model.top, model.right, model.bottom, mRectPaint);              // 画矩形
+            canvas.drawRect(model.left, model.nowHeight, model.right, model.bottom, mRectPaint);              // 画矩形
         }
+    }
+
+    /**
+     * 开始动画
+     */
+    private void startAnimation(){
+        for (int i = 0; i < histogramModelList.size(); i++) {
+            final HistogramModel model = histogramModelList.get(i);
+            ValueAnimator animator = ValueAnimator.ofFloat(0, model.top);
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            animator.setDuration(800);
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    model.nowHeight = (float) animation.getAnimatedValue();
+                    model.nowValue = (int)(model.nowHeight / model.top * model.value);
+                    postInvalidate();
+                }
+            });
+            animator.start();
+        }
+    }
+
+    /**
+     * 最好停止动画，避免发生内存泄露
+     */
+    public void stopAnimation() {
+        this.clearAnimation();
     }
 
     /**
@@ -235,6 +284,8 @@ public class Histogram extends View {
         public float bottom;    //矩形右下角Y坐标
         public float right;     //矩形右下角X坐标
         public float centerX;   //矩形中心X坐标
+        public float nowHeight; //动画的实时高度
+        public int nowValue;  //实时的值
     }
 
     /**

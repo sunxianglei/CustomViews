@@ -9,9 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:padding="30dp"
-        app:histogram_textSize="12dp"
+        app:histogram_textSize="12sp"
         app:histogram_textColor="@color/gray"
-        app:histogram_scaleTextSize="10dp"
+        app:histogram_scaleTextSize="10sp"
         app:histogram_scaleTextColor="@color/blue"></com.xianglei.customviews.view.Histogram>
 
 </LinearLayout>

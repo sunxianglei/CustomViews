@@ -21,7 +21,7 @@ public class HistogramFragment extends Fragment{
     public static final String[] HISTOGRAM_NAMES = {"Froyo", "GB", "ICS", "JB", "KitKat", "L", "M"};
     public static final int[] HISTOGRAM_COLORS = {Color.BLUE, Color.GREEN, Color.RED,
             Color.BLACK, Color.GREEN, Color.RED, Color.BLUE};
-    public static final int[] HISTOGRAM_VALUES = {1 ,10, 1, 5, 6, 2, 8};
+    public static final int[] HISTOGRAM_VALUES = {10 ,100, 10, 50, 60, 200, 80};
 
     private Histogram mHistogram;
 
@@ -31,8 +31,14 @@ public class HistogramFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_view_histogram, container, false);
         mHistogram = (Histogram) view.findViewById(R.id.histogram);
         mHistogram.setData(HISTOGRAM_NAMES, HISTOGRAM_COLORS, HISTOGRAM_VALUES);
+//        mHistogram.hideValue(true);
 //        mHistogram.hideScale(true);
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        mHistogram = null;
+        super.onDestroyView();
+    }
 }
