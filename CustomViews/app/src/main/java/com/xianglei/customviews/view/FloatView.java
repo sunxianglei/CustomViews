@@ -44,6 +44,7 @@ public class FloatView extends FloatingActionButton {
 
     private void init(){
         screenWidth = DisplayUtil.getMobileWidth(getContext());
+        setClickable(true);
     }
 
     @Override

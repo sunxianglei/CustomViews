@@ -6,6 +6,7 @@
     <com.xianglei.customviews.view.FloatView
         android:id="@+id/view_float"
         android:layout_height="50dp"
-        android:layout_width="50dp"></com.xianglei.customviews.view.FloatView>
+        android:layout_width="50dp">
+    </com.xianglei.customviews.view.FloatView>
 
 </LinearLayout>
