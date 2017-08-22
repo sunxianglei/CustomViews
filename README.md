@@ -4,9 +4,9 @@
 
 ### 直方图
 
-![直方图1](D:\QQ\records\381671896\FileRecv\MobileFile\直方图1.png)
+![直方图1](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E7%9B%B4%E6%96%B9%E5%9B%BE1.png)
 
-![直方图2](D:\QQ\records\381671896\FileRecv\MobileFile\直方图2.png)
+![直方图2](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E7%9B%B4%E6%96%B9%E5%9B%BE2.png)
 
 直方图使用方法：
 
@@ -53,9 +53,9 @@
 
 ### 饼图
 
-![饼图1](D:\QQ\records\381671896\FileRecv\MobileFile\饼图1.png)
+![饼图1](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E9%A5%BC%E5%9B%BE1.png)
 
-![饼图2](D:\QQ\records\381671896\FileRecv\MobileFile\饼图2.png)
+![饼图2](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E9%A5%BC%E5%9B%BE2.png)
 
 饼图使用方法：
 
@@ -98,9 +98,9 @@ mPieChart.setMode(PieChart.INSIDE_MODE);
 
 ### 悬浮可拖拽按钮
 
-![悬浮按钮1](D:\QQ\records\381671896\FileRecv\MobileFile\悬浮按钮1.png)
+![悬浮按钮1](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%82%AC%E6%B5%AE%E6%8C%89%E9%92%AE1.png)
 
-![悬浮按钮2](D:\QQ\records\381671896\FileRecv\MobileFile\悬浮按钮2.png)
+![悬浮按钮2](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%82%AC%E6%B5%AE%E6%8C%89%E9%92%AE2.png)
 
 悬浮可拖拽按钮使用方法较简单，直接在布局中加入以下代码即可：
 
