@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <com.xianglei.customviews.view.MyClockView
+        android:id="@+id/custom_clock"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:clock_hour_pointer_color="@color/blue"
+        app:clock_minute_pointer_out_length="20dp"
+        app:clock_text_size="15sp"
+        app:clock_scale_length="9dp"
+        app:clock_center_circle_radius="10dp"/>
+
+</LinearLayout>

@@ -4,4 +4,5 @@
     <string name="histogram">直方图</string>
     <string name="pie_chart">饼图</string>
     <string name="float_view">悬浮按钮</string>
+    <string name="clock_view">机械表</string>
 </resources>

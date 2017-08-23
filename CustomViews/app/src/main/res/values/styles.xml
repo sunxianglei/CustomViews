@@ -22,4 +22,37 @@
         <attr name="pie_lineColor" format="color"></attr>
     </declare-styleable>
 
+    <declare-styleable name="MyClockView">
+        <!--中心圆半径-->
+        <attr name="clock_center_circle_radius" format="dimension"></attr>
+        <!--时间数字字体大小-->
+        <attr name="clock_text_size" format="dimension"/>
+        <!--时针宽度-->
+        <attr name="clock_hour_pointer_width" format="dimension"/>
+        <!--分针宽度-->
+        <attr name="clock_minute_pointer_width" format="dimension"/>
+        <!--秒针宽度-->
+        <attr name="clock_second_pointer_width" format="dimension"/>
+        <!--指针圆角半径-->
+        <attr name="clock_pointer_corner_radius" format="dimension"/>
+        <!--时针超出中心点宽度-->
+        <attr name="clock_hour_pointer_out_length" format="dimension"/>
+        <!--分针超出中心点宽度-->
+        <attr name="clock_minute_pointer_out_length" format="dimension"/>
+        <!--秒针超出中心点宽度-->
+        <attr name="clock_second_pointer_out_length" format="dimension"/>
+        <!--短刻度长度(长刻度是短刻度的1.5倍)-->
+        <attr name="clock_scale_length" format="dimension"></attr>
+        <!--长刻度颜色-->
+        <attr name="clock_scale_long_color" format="color"/>
+        <!--短刻度颜色-->
+        <attr name="clock_scale_short_color" format="color"/>
+        <!--时针颜色-->
+        <attr name="clock_hour_pointer_color" format="color"/>
+        <!--分针颜色-->
+        <attr name="clock_minute_pointer_color" format="color"/>
+        <!--秒针颜色-->
+        <attr name="clock_second_pointer_color" format="color"/>
+    </declare-styleable>
+
 </resources>
