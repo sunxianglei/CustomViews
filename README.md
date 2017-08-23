@@ -114,4 +114,64 @@ mPieChart.setMode(PieChart.INSIDE_MODE);
 
 
 
+### 机械表
+
+![机械表](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%9C%BA%E6%A2%B0%E8%A1%A8.png)
+
+机械表使用方法：
+
+~~~
+    //xml布局文件
+    <com.xianglei.customviews.view.MyClockView
+        android:id="@+id/custom_clock"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:clock_hour_pointer_color="@color/blue"
+        app:clock_minute_pointer_out_length="20dp"
+        app:clock_text_size="15sp"
+        app:clock_scale_length="9dp"
+        app:clock_center_circle_radius="10dp"/>
+~~~
+
+机械表支持一下自定义属性：
+
+```
+    <declare-styleable name="MyClockView">
+        <!--中心圆半径-->
+        <attr name="clock_center_circle_radius" format="dimension"></attr>
+        <!--时间数字字体大小-->
+        <attr name="clock_text_size" format="dimension"/>
+        <!--时针宽度-->
+        <attr name="clock_hour_pointer_width" format="dimension"/>
+        <!--分针宽度-->
+        <attr name="clock_minute_pointer_width" format="dimension"/>
+        <!--秒针宽度-->
+        <attr name="clock_second_pointer_width" format="dimension"/>
+        <!--指针圆角半径-->
+        <attr name="clock_pointer_corner_radius" format="dimension"/>
+        <!--时针超出中心点宽度-->
+        <attr name="clock_hour_pointer_out_length" format="dimension"/>
+        <!--分针超出中心点宽度-->
+        <attr name="clock_minute_pointer_out_length" format="dimension"/>
+        <!--秒针超出中心点宽度-->
+        <attr name="clock_second_pointer_out_length" format="dimension"/>
+        <!--短刻度长度(长刻度是短刻度的1.5倍)-->
+        <attr name="clock_scale_length" format="dimension"></attr>
+        <!--长刻度颜色-->
+        <attr name="clock_scale_long_color" format="color"/>
+        <!--短刻度颜色-->
+        <attr name="clock_scale_short_color" format="color"/>
+        <!--时针颜色-->
+        <attr name="clock_hour_pointer_color" format="color"/>
+        <!--分针颜色-->
+        <attr name="clock_minute_pointer_color" format="color"/>
+        <!--秒针颜色-->
+        <attr name="clock_second_pointer_color" format="color"/>
+    </declare-styleable>
+
+```
+
+
+
 ###未完待续。。。
+
