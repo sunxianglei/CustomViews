@@ -55,4 +55,20 @@
         <attr name="clock_second_pointer_color" format="color"/>
     </declare-styleable>
 
+    <declare-styleable name="LoadingView">
+        <attr name="loading_text_color" format="color"/>
+        <attr name="loading_circle_color" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="RuleView">
+        <attr name="rule_middle_line_color" format="color"></attr>
+        <attr name="rule_scale_text_color" format="color"></attr>
+        <attr name="rule_scale_line_color" format="color"></attr>
+        <attr name="rule_scale_text_size" format="dimension"></attr>
+        <attr name="rule_min_unit_value" format="float"></attr>
+        <attr name="rule_max_value" format="float"></attr>
+        <attr name="rule_max_show_value" format="float"></attr>
+        <attr name="rule_default_value" format="float"></attr>
+    </declare-styleable>
+
 </resources>

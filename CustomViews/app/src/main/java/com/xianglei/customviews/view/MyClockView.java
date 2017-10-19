@@ -94,8 +94,10 @@ public class MyClockView extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
-        if (widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
+        if (widthMode != MeasureSpec.UNSPECIFIED) {
             width = Math.min(width, widthSize);
+        }
+        if( heightMode != MeasureSpec.UNSPECIFIED ){
             width = Math.min(width, heightSize);
         }
         setMeasuredDimension(width, width);

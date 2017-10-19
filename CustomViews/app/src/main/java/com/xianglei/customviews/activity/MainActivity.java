@@ -1,4 +1,4 @@
-package com.xianglei.customviews;
+package com.xianglei.customviews.activity;
 
 import android.os.Bundle;
 import android.support.annotation.StringRes;
@@ -8,10 +8,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.xianglei.customviews.R;
 import com.xianglei.customviews.fragment.ClockViewFragment;
 import com.xianglei.customviews.fragment.FloatViewFragment;
 import com.xianglei.customviews.fragment.HistogramFragment;
+import com.xianglei.customviews.fragment.LoadingViewFragment;
 import com.xianglei.customviews.fragment.PieChartFragment;
+import com.xianglei.customviews.fragment.RuleViewFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initPageModel();
         pager = (ViewPager) findViewById(R.id.pager);
+        pager.setCurrentItem(4);
         pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
 
             @Override
@@ -57,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         pageModels.add(new PageModel( R.string.pie_chart, new PieChartFragment()));
         pageModels.add(new PageModel( R.string.float_view, new FloatViewFragment()));
         pageModels.add(new PageModel(R.string.clock_view, new ClockViewFragment()));
+        pageModels.add(new PageModel(R.string.loading_view, new LoadingViewFragment()));
+        pageModels.add(new PageModel(R.string.rule_view, new RuleViewFragment()));
     }
 
     private class PageModel {

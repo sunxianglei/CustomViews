@@ -46,7 +46,7 @@ public class Histogram extends View {
     private Paint mLinePaint;
 
     public Histogram(Context context) {
-        super(context, null);
+        this(context, null);
     }
 
     public Histogram(Context context, AttributeSet attrs) {

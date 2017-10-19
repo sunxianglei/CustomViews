@@ -5,4 +5,6 @@
     <string name="pie_chart">饼图</string>
     <string name="float_view">悬浮按钮</string>
     <string name="clock_view">机械表</string>
+    <string name="loading_view">加载框</string>
+    <string name="rule_view">尺子</string>
 </resources>

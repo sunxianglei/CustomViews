@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/deep_gray">
+
+    <com.xianglei.customviews.view.LoadingView
+        android:id="@+id/view_loading"
+        android:layout_height="70dp"
+        android:layout_width="70dp"
+        app:loading_circle_color="@color/green"
+        app:loading_text_color="@color/blue"/>
+
+</LinearLayout>
