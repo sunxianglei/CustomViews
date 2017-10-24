@@ -4,9 +4,7 @@
 
 ### 直方图
 
-![直方图1](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E7%9B%B4%E6%96%B9%E5%9B%BE1.png)
-
-![直方图2](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E7%9B%B4%E6%96%B9%E5%9B%BE2.png)
+![直方图](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E7%9B%B4%E6%96%B9%E5%9B%BE.gif)
 
 直方图使用方法：
 
@@ -98,9 +96,7 @@ mPieChart.setMode(PieChart.INSIDE_MODE);
 
 ### 悬浮可拖拽按钮
 
-![悬浮按钮1](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%82%AC%E6%B5%AE%E6%8C%89%E9%92%AE1.png)
-
-![悬浮按钮2](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%82%AC%E6%B5%AE%E6%8C%89%E9%92%AE2.png)
+![悬浮按钮](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%82%AC%E6%B5%AE%E6%8C%89%E9%92%AE.gif)
 
 悬浮可拖拽按钮使用方法较简单，直接在布局中加入以下代码即可：
 
@@ -116,7 +112,7 @@ mPieChart.setMode(PieChart.INSIDE_MODE);
 
 ### 机械表
 
-![机械表](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%9C%BA%E6%A2%B0%E8%A1%A8.png)
+![机械表](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%9C%BA%E6%A2%B0%E8%A1%A8.gif)
 
 机械表使用方法：
 
@@ -169,6 +165,59 @@ mPieChart.setMode(PieChart.INSIDE_MODE);
         <attr name="clock_second_pointer_color" format="color"/>
     </declare-styleable>
 
+```
+
+
+
+### 加载框
+
+![加载框](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E5%8A%A0%E8%BD%BD%E6%A1%86.gif)
+
+加载框使用方法（可以定义圆圈颜色和文字颜色）：
+
+```
+<com.xianglei.customviews.view.LoadingView
+    android:id="@+id/view_loading"
+    android:layout_height="70dp"
+    android:layout_width="70dp"
+    app:loading_circle_color="@color/green"
+    app:loading_text_color="@color/blue"/>
+```
+
+
+
+### 滑动卷尺
+
+![滑动卷尺](https://github.com/sunxianglei/ImageLibrary/blob/master/images/%E6%BB%91%E5%8A%A8%E5%8D%B7%E5%B0%BA.gif)
+
+滑动卷尺使用方法：
+
+```
+<com.xianglei.customviews.view.RuleView
+    android:id="@+id/view_rule"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    android:layout_marginTop="30dp"
+    android:background="@color/light_gray"
+    app:rule_middle_line_color="@color/blue"
+    app:rule_min_unit_value="0.1"
+    app:rule_max_value="100"
+    app:rule_default_value="30"/>
+```
+
+滑动卷尺自定义属性：
+
+```
+<declare-styleable name="RuleView">
+    <attr name="rule_middle_line_color" format="color"></attr>
+    <attr name="rule_scale_text_color" format="color"></attr>
+    <attr name="rule_scale_line_color" format="color"></attr>
+    <attr name="rule_scale_text_size" format="dimension"></attr>
+    <attr name="rule_min_unit_value" format="float"></attr>
+    <attr name="rule_max_value" format="float"></attr>
+    <attr name="rule_max_show_value" format="float"></attr>
+    <attr name="rule_default_value" format="float"></attr>
+</declare-styleable>
 ```
 
 
