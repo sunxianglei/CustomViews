@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
-
-    <com.xianglei.customviews.view.RuleView
-        android:id="@+id/view_rule"
-        android:layout_width="match_parent"
-        android:layout_height="100dp" />
 
     <TextView
         android:id="@+id/tv_value"
@@ -16,26 +12,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:gravity="center"
-        android:textSize="30sp"
+        android:textSize="35sp"
         android:textColor="@color/green"/>
 
-    <com.xianglei.customviews.view.RuleView2
-        android:id="@+id/view_rule2"
+    <com.xianglei.customviews.view.RuleView
+        android:id="@+id/view_rule"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="130dp"
         android:layout_marginTop="30dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray"
+        app:rule_middle_line_color="@color/blue"
+        app:rule_min_unit_value="0.1"
+        app:rule_max_value="100"
+        app:rule_default_value="30"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/gray"></View>
-
-    <Button
-        android:id="@+id/btn_rule"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="点击进入滑动尺子页面"/>
+        android:background="@color/light_gray"></View>
 
 </LinearLayout>

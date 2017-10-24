@@ -1,13 +1,13 @@
 package com.xianglei.customviews.view;
 
-import android.annotation.SuppressLint;
+
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
-import android.text.Layout;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -15,331 +15,279 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
+import com.xianglei.customviews.R;
+import com.xianglei.customviews.utils.DisplayUtil;
+import com.xianglei.customviews.utils.MathUtil;
+
+
 /**
- * 卷尺控件类。由于时间比较紧，只有下班后有时间，因此只实现了基本功能。<br>
- * 细节问题包括滑动过程中widget边缘的刻度显示问题等<br>
- * <p>
- * 周末有时间会继续更新<br>
- *
- * @author ttdevs
- * @version create：2014年8月26日
+ * 滑动卷尺（仿薄荷健康滑动卷尺）
+ * Created by sunxianglei on 2017/10/17.
  */
-@SuppressLint("ClickableViewAccessibility")
+
 public class RuleView extends View {
-    public interface OnValueChangeListener {
-        public void onValueChange(float value);
+
+
+    private int mHeight;                    //View的高度
+    private float minUnitWidth;             //最小刻度的宽度
+    private float mValue;                   //现在的值
+    private float mMoveDistance;            //屏幕上移动的距离
+    private float mLastX;
+    private int mMinVelocity;               //手势滑动最小速度
+
+    private Paint mMiddleLinePaint;
+    private Paint mScaleTextPaint;
+    private Paint mScaleLinePaint;
+    private Scroller mScroller;
+    private VelocityTracker mVeloctyTracker;
+
+    private Attrs mAttrs;
+    private OnValueChangeListener mValueChangeListener;
+
+    public RuleView(Context context) {
+        this(context, null);
     }
 
-    public static final int MOD_TYPE_HALF = 2;
-    public static final int MOD_TYPE_ONE = 10;
-    private static final int ITEM_HALF_DIVIDER = 40;
-    private static final int ITEM_ONE_DIVIDER = 10;
-    private static final int ITEM_MAX_HEIGHT = 50;
-    private static final int ITEM_MIN_HEIGHT = 20;
-    private static final int TEXT_SIZE = 18;
-    private float mDensity;
-    private int mValue = 50, mMaxValue = 100, mModType = MOD_TYPE_HALF, mLineDivider = ITEM_HALF_DIVIDER;
-    // private int mValue = 50, mMaxValue = 500, mModType = MOD_TYPE_ONE,
-    // mLineDivider = ITEM_ONE_DIVIDER;
-    private int mLastX, mMove;
-    private int mWidth, mHeight;
-    private int mMinVelocity;
-    private Scroller mScroller;
-    private VelocityTracker mVelocityTracker;
-    private OnValueChangeListener mListener;
-
-    @SuppressWarnings("deprecation")
     public RuleView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+    }
+
+    public RuleView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        parseAttr(attrs);
+        init();
+    }
+
+    private void init(){
+
+        mMiddleLinePaint = new Paint();
+        mMiddleLinePaint.setAntiAlias(true);
+        mMiddleLinePaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 4));
+        mMiddleLinePaint.setColor(mAttrs.middleLineColor);
+        mMiddleLinePaint.setStrokeCap(Paint.Cap.ROUND);
+
+        mScaleTextPaint = new Paint();
+        mScaleTextPaint.setAntiAlias(true);
+        mScaleTextPaint.setColor(mAttrs.scaleTextColor);
+        mScaleTextPaint.setTextSize(mAttrs.scaleTextSize);
+
+        mScaleLinePaint = new Paint();
+        mScaleLinePaint.setAntiAlias(true);
+        mScaleLinePaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 2));
+        mScaleLinePaint.setColor(mAttrs.scaleLineColor);
+        mScaleLinePaint.setStrokeCap(Paint.Cap.ROUND);
+
         mScroller = new Scroller(getContext());
-        mDensity = getContext().getResources().getDisplayMetrics().density;
+        mVeloctyTracker = VelocityTracker.obtain();
         mMinVelocity = ViewConfiguration.get(getContext()).getScaledMinimumFlingVelocity();
-        // setBackgroundResource(R.drawable.bg_wheel);
+        mValue = mAttrs.defaultValue;
         setBackgroundDrawable(createBackground());
     }
 
-    private GradientDrawable createBackground() {
-        float strokeWidth = 4 * mDensity; // 边框宽度
-        float roundRadius = 6 * mDensity; // 圆角半径
-        int strokeColor = Color.parseColor("#FF666666");// 边框颜色
-        // int fillColor = Color.parseColor("#DFDFE0");// 内部填充颜色
-
-        setPadding((int) strokeWidth, (int) strokeWidth, (int) strokeWidth, 0);
-        int colors[] = {0xFF999999, 0xFFFFFFFF, 0xFF999999};// 分别为开始颜色，中间夜色，结束颜色
-        GradientDrawable bgDrawable = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);// 创建drawable
-        // bgDrawable.setColor(fillColor);
-        bgDrawable.setCornerRadius(roundRadius);
-        bgDrawable.setStroke((int) strokeWidth, strokeColor);
-        // setBackgroundDrawable(gd);
+    /**
+     * 渐变背景色
+     * @return
+     */
+    private GradientDrawable createBackground(){
+        int colors[] = {0xffedebeb, 0xffffffff};// 分别为开始颜色，结束颜色
+        GradientDrawable bgDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
         return bgDrawable;
     }
 
-    /**
-     * 考虑可扩展，但是时间紧迫，只可以支持两种类型效果图中两种类型
-     *
-     * @param defaultValue
-     * @param maxValue     最大值初始值
-     * @param model        刻度盘精度：<br>
-     */
-    public void initViewParam(int defaultValue, int maxValue, int model) {
-        switch (model) {
-            case MOD_TYPE_HALF:
-                mModType = MOD_TYPE_HALF;
-                mLineDivider = ITEM_HALF_DIVIDER;
-                mValue = defaultValue * 2;
-                mMaxValue = maxValue * 2;
-                break;
-            case MOD_TYPE_ONE:
-                mModType = MOD_TYPE_ONE;
-                mLineDivider = ITEM_ONE_DIVIDER;
-                mValue = defaultValue;
-                mMaxValue = maxValue;
-                break;
-            default:
-                break;
-        }
-        invalidate();
-        mLastX = 0;
-        mMove = 0;
-        notifyValueChange();
-    }
-
-    /**
-     * 设置用于接收结果的监听器
-     *
-     * @param listener
-     */
-    public void setValueChangeListener(OnValueChangeListener listener) {
-        mListener = listener;
-    }
-
-    /**
-     * 获取当前刻度值
-     *
-     * @return
-     */
-    public float getValue() {
-        return mValue;
+    private void parseAttr(AttributeSet attrs){
+        TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.RuleView);
+        mAttrs = new Attrs();
+        mAttrs.middleLineColor = ta.getColor(R.styleable.RuleView_rule_middle_line_color, Color.GREEN);
+        mAttrs.scaleLineColor = ta.getColor(R.styleable.RuleView_rule_scale_line_color, Color.parseColor("#dad8d8"));
+        mAttrs.scaleTextColor = ta.getColor(R.styleable.RuleView_rule_scale_text_color, Color.BLACK);
+        mAttrs.scaleTextSize = ta.getDimensionPixelSize(R.styleable.RuleView_rule_scale_text_size,
+                DisplayUtil.sp2px(getContext(), 25));
+        mAttrs.minUnitValue = ta.getFloat(R.styleable.RuleView_rule_min_unit_value, 0.1f);
+        mAttrs.maxShowValue = ta.getFloat(R.styleable.RuleView_rule_max_show_value, 3.2f);
+        mAttrs.maxValue = ta.getFloat(R.styleable.RuleView_rule_max_value, 200f);
+        mAttrs.defaultValue = ta.getFloat(R.styleable.RuleView_rule_default_value, 50f);
+        ta.recycle();
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        mWidth = getWidth();
-        mHeight = getHeight();
-        super.onLayout(changed, left, top, right, bottom);
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        minUnitWidth = w / (mAttrs.maxShowValue / mAttrs.minUnitValue);
+        mHeight = h;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        drawScaleLine(canvas);
-        // drawWheel(canvas);
-        drawMiddleLine(canvas);
-    }
-//    private void drawWheel(Canvas canvas) {
-//        Drawable wheel = getResources().getDrawable(R.drawable.bg_wheel);
-//        wheel.setBounds(0, 0, getWidth(), getHeight());
-//        wheel.draw(canvas);
-//    }
-
-    /**
-     * 从中间往两边开始画刻度线
-     *
-     * @param canvas
-     */
-    private void drawScaleLine(Canvas canvas) {
-        canvas.save();
-        Paint linePaint = new Paint();
-        linePaint.setStrokeWidth(2);
-        linePaint.setColor(Color.BLACK);
-        TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setTextSize(TEXT_SIZE * mDensity);
-        int width = mWidth, drawCount = 0;
-        float xPosition = 0, textWidth = Layout.getDesiredWidth("0", textPaint);
-        for (int i = 0; drawCount <= 4 * width; i++) {
-            int numSize = String.valueOf(mValue + i).length();
-            xPosition = (width / 2 - mMove) + i * mLineDivider * mDensity;
-            if (xPosition + getPaddingRight() < mWidth) {
-                if ((mValue + i) % mModType == 0) {
-                    canvas.drawLine(xPosition, getPaddingTop(), xPosition, mDensity * ITEM_MAX_HEIGHT, linePaint);
-                    if (mValue + i <= mMaxValue) {
-                        switch (mModType) {
-                            case MOD_TYPE_HALF:
-                                canvas.drawText(String.valueOf((mValue + i) / 2), countLeftStart(mValue + i, xPosition, textWidth), getHeight() - textWidth, textPaint);
-                                break;
-                            case MOD_TYPE_ONE:
-                                canvas.drawText(String.valueOf(mValue + i), xPosition - (textWidth * numSize / 2), getHeight() - textWidth, textPaint);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                } else {
-                    canvas.drawLine(xPosition, getPaddingTop(), xPosition, mDensity * ITEM_MIN_HEIGHT, linePaint);
-                }
-            }
-            xPosition = (width / 2 - mMove) - i * mLineDivider * mDensity;
-            if (xPosition > getPaddingLeft()) {
-                if ((mValue - i) % mModType == 0) {
-                    canvas.drawLine(xPosition, getPaddingTop(), xPosition, mDensity * ITEM_MAX_HEIGHT, linePaint);
-                    if (mValue - i >= 0) {
-                        switch (mModType) {
-                            case MOD_TYPE_HALF:
-                                canvas.drawText(String.valueOf((mValue - i) / 2), countLeftStart(mValue - i, xPosition, textWidth), getHeight() - textWidth, textPaint);
-                                break;
-                            case MOD_TYPE_ONE:
-                                canvas.drawText(String.valueOf(mValue - i), xPosition - (textWidth * numSize / 2), getHeight() - textWidth, textPaint);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                } else {
-                    canvas.drawLine(xPosition, getPaddingTop(), xPosition, mDensity * ITEM_MIN_HEIGHT, linePaint);
-                }
-            }
-            drawCount += 2 * mLineDivider * mDensity;
-        }
-        canvas.restore();
-    }
-
-    /**
-     * 计算没有数字显示位置的辅助方法
-     *
-     * @param value
-     * @param xPosition
-     * @param textWidth
-     * @return
-     */
-    private float countLeftStart(int value, float xPosition, float textWidth) {
-        float xp = 0f;
-        if (value < 20) {
-            xp = xPosition - (textWidth * 1 / 2);
-        } else {
-            xp = xPosition - (textWidth * 2 / 2);
-        }
-        return xp;
-    }
-
-    /**
-     * 画中间的红色指示线、阴影等。指示线两端简单的用了两个矩形代替
-     *
-     * @param canvas
-     */
-    private void drawMiddleLine(Canvas canvas) {
-        // TOOD 常量太多，暂时放这，最终会放在类的开始，放远了怕很快忘记
-        int gap = 12, indexWidth = 8, indexTitleWidth = 24, indexTitleHight = 10, shadow = 6;
-        String color = "#66999999";
-        canvas.save();
-        Paint redPaint = new Paint();
-        redPaint.setStrokeWidth(indexWidth);
-        redPaint.setColor(Color.RED);
-        canvas.drawLine(mWidth / 2, 0, mWidth / 2, mHeight, redPaint);
-        Paint ovalPaint = new Paint();
-        ovalPaint.setColor(Color.RED);
-        ovalPaint.setStrokeWidth(indexTitleWidth);
-        canvas.drawLine(mWidth / 2, 0, mWidth / 2, indexTitleHight, ovalPaint);
-        canvas.drawLine(mWidth / 2, mHeight - indexTitleHight, mWidth / 2, mHeight, ovalPaint);
-        // RectF ovalRectF = new RectF(mWidth / 2 - 10, 0, mWidth / 2 + 10, 4 *
-        // mDensity); //TODO 椭圆
-        // canvas.drawOval(ovalRectF, ovalPaint);
-        // ovalRectF.set(mWidth / 2 - 10, mHeight - 8 * mDensity, mWidth / 2 +
-        // 10, mHeight); //TODO
-        Paint shadowPaint = new Paint();
-        shadowPaint.setStrokeWidth(shadow);
-        shadowPaint.setColor(Color.parseColor(color));
-        canvas.drawLine(mWidth / 2 + gap, 0, mWidth / 2 + gap, mHeight, shadowPaint);
-        canvas.restore();
+        drawRuler(canvas);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getAction();
-        int xPosition = (int) event.getX();
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        mVelocityTracker.addMovement(event);
-        switch (action) {
+        float currentX = event.getX();
+        mVeloctyTracker.addMovement(event);
+        switch (action){
             case MotionEvent.ACTION_DOWN:
                 mScroller.forceFinished(true);
-                mLastX = xPosition;
-                mMove = 0;
+                getParent().requestDisallowInterceptTouchEvent(true);
+                mLastX = currentX;
+                mMoveDistance = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
-                mMove += (mLastX - xPosition);
-                changeMoveAndValue();
+                mMoveDistance += mLastX - currentX;
+                SmoothByMove();
+                mLastX = currentX;
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                countMoveEnd();
-                countVelocityTracker(event);
-                return false;
-            // break;
+                SmoothMoveEnd();
+                SmoothByVelocity();
+                break;
             default:
                 break;
         }
-        mLastX = xPosition;
         return true;
     }
 
-    private void countVelocityTracker(MotionEvent event) {
-        mVelocityTracker.computeCurrentVelocity(1000);
-        float xVelocity = mVelocityTracker.getXVelocity();
-        if (Math.abs(xVelocity) > mMinVelocity) {
-            mScroller.fling(0, 0, (int) xVelocity, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
-        }
-    }
 
-    private void changeMoveAndValue() {
-        int tValue = (int) (mMove / (mLineDivider * mDensity));
-        if (Math.abs(tValue) > 0) {
-            mValue += tValue;
-            mMove -= tValue * mLineDivider * mDensity;
-            if (mValue <= 0 || mValue > mMaxValue) {
-                mValue = mValue <= 0 ? 0 : mMaxValue;
-                mMove = 0;
+
+    /**
+     * 作用：计算需要滑动距离以及现在的中间值
+     * 思路：将累积的滑动距离除最小单位的长度从而得到新的值和距离，只要这样做才能做到滑动的连贯性以及不会缺失值
+     */
+    private void SmoothByMove(){
+        int moveScale = Math.round(mMoveDistance / minUnitWidth);
+        if(Math.abs(moveScale) > 0){
+            mValue = MathUtil.addFloatNum(mValue, moveScale * mAttrs.minUnitValue);
+            mMoveDistance -= moveScale * minUnitWidth;
+            if(mValue < 0 || mValue > mAttrs.maxValue){
+                mValue = mValue < 0 ? 0 : mAttrs.maxValue;
+                mMoveDistance = 0;
                 mScroller.forceFinished(true);
             }
-            notifyValueChange();
         }
+        if(mValueChangeListener != null) mValueChangeListener.onValueChange(MathUtil.keepDecimals(mValue, 2));
         postInvalidate();
     }
 
-    private void countMoveEnd() {
-        int roundMove = Math.round(mMove / (mLineDivider * mDensity)); //四舍五入
-        mValue = mValue + roundMove;
-        mValue = mValue <= 0 ? 0 : mValue;
-        mValue = mValue > mMaxValue ? mMaxValue : mValue;
+    /**
+     * 手指抬起的时候要校准到最近的刻度上
+     */
+    private void SmoothMoveEnd(){
+        int moveScale = Math.round(mMoveDistance / minUnitWidth);
+        mValue = MathUtil.addFloatNum(mValue, moveScale * mAttrs.minUnitValue);
+        if(mValue < 0 || mValue > mAttrs.maxValue){
+            mValue = mValue < 0 ? 0 : mAttrs.maxValue;
+        }
+        mMoveDistance = 0;
         mLastX = 0;
-        mMove = 0;
-        notifyValueChange();
+        if(mValueChangeListener != null) mValueChangeListener.onValueChange(MathUtil.keepDecimals(mValue, 2));
         postInvalidate();
     }
 
-    private void notifyValueChange() {
-        if (null != mListener) {
-            if (mModType == MOD_TYPE_ONE) {
-                mListener.onValueChange(mValue);
-            }
-            if (mModType == MOD_TYPE_HALF) {
-                mListener.onValueChange(mValue / 2f);
-            }
+    /**
+     * 根据速率惯性滑动
+     */
+    private void SmoothByVelocity(){
+        mVeloctyTracker.computeCurrentVelocity(1000);
+        float velocityX = mVeloctyTracker.getXVelocity();
+        if(Math.abs(velocityX) > mMinVelocity){
+            mScroller.fling(0, 0, (int)velocityX, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
         }
     }
 
     @Override
     public void computeScroll() {
         super.computeScroll();
-        if (mScroller.computeScrollOffset()) {
-            if (mScroller.getCurrX() == mScroller.getFinalX()) { // over
-                countMoveEnd();
-            } else {
-                int xPosition = mScroller.getCurrX();
-                mMove += (mLastX - xPosition);
-                changeMoveAndValue();
-                mLastX = xPosition;
+        if(mScroller.computeScrollOffset()){
+            if(mScroller.getCurrX() == mScroller.getFinalX()){ // 惯性滑动结束，执行校准刻度操作
+                SmoothMoveEnd();
+            }else{ // 和手指滑动完全一样的处理
+                mMoveDistance += mLastX - mScroller.getCurrX();
+                SmoothByMove();
+                mLastX = mScroller.getCurrX();
             }
         }
+    }
+
+    /**
+     * 画刻度尺,从中间开始画
+     * @param canvas
+     */
+    private void drawRuler(Canvas canvas){
+        int centerX = (getRight() + getLeft())/2;
+        int shortLine = mHeight / 4;
+        int longLine = mHeight / 2;
+        Rect rect = new Rect();
+        String text = null;
+        float value = mValue;
+        int length = (int)(mAttrs.maxShowValue / mAttrs.minUnitValue / 2);    // 计算页面能显示的刻度数量的一半来分别往左右两边画
+        //向左画刻度
+        for(int i = 0;i <= length;i++){
+            if(value == Math.round(value)){ //画长刻度并表上刻度值
+                canvas.drawLine(centerX - minUnitWidth * i - mMoveDistance, 0,
+                        centerX - minUnitWidth * i - mMoveDistance, longLine, mScaleLinePaint);
+                text = String.valueOf((int)value);
+                mScaleTextPaint.getTextBounds(text, 0, text.length(), rect);
+                if(value >= 0) {
+                    canvas.drawText(text, centerX - minUnitWidth * i - mMoveDistance - (rect.right - rect.left) / 2,
+                            longLine + 1.5f * mScaleTextPaint.getFontSpacing(), mScaleTextPaint);
+                }
+            }else { //画短刻度
+                canvas.drawLine(centerX - minUnitWidth * i - mMoveDistance, 0,
+                        centerX - minUnitWidth * i - mMoveDistance, shortLine, mScaleLinePaint);
+            }
+            value = MathUtil.subFloatNum(value, mAttrs.minUnitValue);
+        }
+        value = mValue;
+        //向右画刻度
+        for(int i = 0;i <= length;i++){
+            if(value == Math.round(value)){ //画长刻度并表上刻度值
+                canvas.drawLine(centerX + minUnitWidth * i - mMoveDistance, 0,
+                        centerX + minUnitWidth * i - mMoveDistance, longLine, mScaleLinePaint);
+                text = String.valueOf((int)value);
+                mScaleTextPaint.getTextBounds(text, 0, text.length(), rect);
+                if(value <= mAttrs.maxValue) {
+                    canvas.drawText(text, centerX + minUnitWidth * i - mMoveDistance - (rect.right - rect.left) / 2,
+                            longLine + 1.5f * mScaleTextPaint.getFontSpacing(), mScaleTextPaint);
+                }
+            }else { //画短刻度
+                canvas.drawLine(centerX + minUnitWidth * i - mMoveDistance, 0,
+                        centerX + minUnitWidth * i - mMoveDistance, shortLine, mScaleLinePaint);
+            }
+            value = MathUtil.addFloatNum(value, mAttrs.minUnitValue);
+        }
+
+        canvas.drawLine(centerX, 0, centerX, longLine + DisplayUtil.dip2px(getContext(), 10), mMiddleLinePaint);   // 画中间指示线
+    }
+
+    public float getValue(){
+        return mValue;
+    }
+
+    public void setOnValueChangeListener(OnValueChangeListener listener){
+        this.mValueChangeListener = listener;
+    }
+
+    // 内部接口、类
+    // ==========================
+
+    public interface OnValueChangeListener {
+        public void onValueChange(float value);
+    }
+
+    /**
+     * 自定义属性类
+     */
+    public class Attrs{
+        int scaleLineColor;     //刻度线颜色
+        int middleLineColor;    //中间线颜色
+        int scaleTextColor;     //数字颜色
+        int scaleTextSize;      //数字大小
+        float minUnitValue;     //最小刻度单位（cm为准）
+        float maxValue;         //刻度最大值
+        float maxShowValue;     //UI上可展示的刻度值范围
+        float defaultValue;     //默认刻度值
     }
 }
