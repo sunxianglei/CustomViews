@@ -71,4 +71,31 @@
         <attr name="rule_default_value" format="float"></attr>
     </declare-styleable>
 
+    <declare-styleable name="PeriodProgress">
+        <!--第一行文字大小-->
+        <attr name="text_size_first" format="dimension"></attr>
+        <!--第二行文字大小-->
+        <attr name="text_size_second" format="dimension"></attr>
+        <!--未完成阶段第一行文字颜色-->
+        <attr name="text_color_first" format="color"></attr>
+        <!--完成阶段第一行文字颜色-->
+        <attr name="text_finish_color_first" format="color"></attr>
+        <!--未完成阶段第二行文字颜色-->
+        <attr name="text_color_second" format="color"></attr>
+        <!--完成阶段第二行文字颜色-->
+        <attr name="text_finish_color_second" format="color"></attr>
+        <!--圆形半径-->
+        <attr name="circle_radius" format="dimension"></attr>
+        <!--未完成圆形颜色-->
+        <attr name="circle_color" format="color"></attr>
+        <!--完成圆形颜色-->
+        <attr name="circle_finish_color" format="color"></attr>
+        <!--线条宽度-->
+        <attr name="line_width" format="dimension"></attr>
+        <!--未完成线条颜色-->
+        <attr name="line_color" format="color"></attr>
+        <!--已完成线条颜色-->
+        <attr name="line_finish_color" format="color"></attr>
+    </declare-styleable>
+
 </resources>

@@ -13,6 +13,7 @@ import com.xianglei.customviews.fragment.ClockViewFragment;
 import com.xianglei.customviews.fragment.FloatViewFragment;
 import com.xianglei.customviews.fragment.HistogramFragment;
 import com.xianglei.customviews.fragment.LoadingViewFragment;
+import com.xianglei.customviews.fragment.PeriodProgressFragment;
 import com.xianglei.customviews.fragment.PieChartFragment;
 import com.xianglei.customviews.fragment.RuleViewFragment;
 
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         pageModels.add(new PageModel(R.string.clock_view, new ClockViewFragment()));
         pageModels.add(new PageModel(R.string.loading_view, new LoadingViewFragment()));
         pageModels.add(new PageModel(R.string.rule_view, new RuleViewFragment()));
+        pageModels.add(new PageModel(R.string.period_progress, new PeriodProgressFragment()));
     }
 
     private class PageModel {
