@@ -87,8 +87,6 @@ public class PeriodProgress extends View {
         mLineColor = ta.getColor(R.styleable.PeriodProgress_line_color, Color.LTGRAY);
         mLineFinishColor = ta.getColor(R.styleable.PeriodProgress_line_finish_color, Color.GRAY);
 
-        mFirstTextPaint.setTextSize(mFirstTextSize);
-        mSecondTextPaint.setTextSize(mSecondTextSize);
         mCirclePaint.setStyle(Paint.Style.FILL);
         mLinePaint.setStrokeWidth(mLineWidth);
     }
@@ -102,12 +100,19 @@ public class PeriodProgress extends View {
         this.name = name;
         this.time = time;
         this.isFinish = isFinish;
+        if(name != null) {
+            mFirstTextPaint.setTextSize(mFirstTextSize);
+        }
+        if(time != null){
+            mSecondTextPaint.setTextSize(mSecondTextSize);
+        }
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int defaultHeight = (int) (mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() * 2 + mCircleRadius);    //wrap_content时的默认高度
+        int defaultHeight = (int) (mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() +
+                2 * mCircleRadius + DisplayUtil.dip2px(getContext(), 10));    //wrap_content时的默认高度
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -154,11 +159,11 @@ public class PeriodProgress extends View {
                         mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() , mSecondTextPaint);
             }
             // 画圆以及连接线
-            canvas.drawCircle(spaceWidth, mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() * 2,
+            canvas.drawCircle(spaceWidth, mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() + 2 * mCircleRadius,
                     mCircleRadius, mCirclePaint);
             if(i != length - 1){
-                canvas.drawLine(spaceWidth + 2 * mCircleRadius,mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() * 2,
-                        mWidth * (i + 1) / (length - 1) - 2 * mCircleRadius, mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() * 2, mLinePaint);
+                canvas.drawLine(spaceWidth + 2 * mCircleRadius,mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing( )+ 2 * mCircleRadius,
+                        mWidth * (i + 1) / (length - 1) - 2 * mCircleRadius, mFirstTextPaint.getFontSpacing() + mSecondTextPaint.getFontSpacing() + 2 * mCircleRadius, mLinePaint);
             }
         }
     }

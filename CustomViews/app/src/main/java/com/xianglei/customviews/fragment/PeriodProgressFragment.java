@@ -26,7 +26,7 @@ public class PeriodProgressFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_period, container, false);
-        mPeriodProgress = view.findViewById(R.id.progress);
+        mPeriodProgress = (PeriodProgress) view.findViewById(R.id.progress);
         mPeriodProgress.setData(name, time, isFinish);
         return view;
     }

@@ -7,4 +7,5 @@
     <string name="clock_view">机械表</string>
     <string name="loading_view">加载框</string>
     <string name="rule_view">尺子</string>
+    <string name="period_progress">阶段进度</string>
 </resources>
